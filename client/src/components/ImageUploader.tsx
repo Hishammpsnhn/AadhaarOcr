@@ -15,7 +15,11 @@ import AddPhotoIcon from "@mui/icons-material/AddPhotoAlternate";
 import { validateImageFile } from "../utils/ImageValidation";
 import useApi from "../hooks/useApi";
 
-const ImageUploader = () => {
+type ImageUploaderProps = {
+  GetData: (data: any, loading: boolean) => void;
+};
+
+const ImageUploader: React.FC<ImageUploaderProps> = ({ GetData }) => {
   const { data, apiError, loading, makeRequest } = useApi();
   const [images, setImages] = useState<(File | null)[]>([null, null]);
   const [error, setError] = useState("");
@@ -45,7 +49,7 @@ const ImageUploader = () => {
     setImages(newImages);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async() => {
     const formData = new FormData();
   
     images.forEach((file) => {
@@ -53,15 +57,19 @@ const ImageUploader = () => {
         formData.append("images", file); 
       }
     });
-  
-    makeRequest({
+    GetData(null,true)
+    const res = await makeRequest({
       method: "POST",
-      url: `${import.meta.env.VITE_API_URL}/api/upload`,
+      url: `${import.meta.env.VITE_API_URL}/api/ocr`,
       data: formData,
       headers: {
         "Content-Type": "multipart/form-data",
       },
     });
+    if(res){
+      console.log(res);
+      GetData(res,false)
+    }
   };
   
   return (

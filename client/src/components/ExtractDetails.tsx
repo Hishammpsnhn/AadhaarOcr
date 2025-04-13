@@ -1,7 +1,13 @@
-import { Box, Divider, Typography } from "@mui/material";
+import { Box, CircularProgress, Divider, Typography } from "@mui/material";
 import React from "react";
+import useApi from "../hooks/useApi";
+type Props = {
+  data: any;
+  loading: boolean;
+};
 
-const ExtractDetails = () => {
+const ExtractDetails: React.FC<Props> = ({ data, loading }) => {
+  console.log(data);
   return (
     <Box
       sx={{
@@ -50,48 +56,39 @@ const ExtractDetails = () => {
         visual assets.
       </Typography>
 
-      <Box
-        sx={{
-          bgcolor: "primary.light",
-          p: 3,
-          borderRadius: 2,
-          mt: 4,
-          color: "white",
-        }}
-      >
-        <Typography variant="h6" gutterBottom>
-          Getting Started
-        </Typography>
+      {data ? (
+        <Box
+          sx={{
+            bgcolor: "#1e1e1e",
+            p: 3,
+            borderRadius: 2,
+            mt: 4,
+            color: "white",
+          }}
+        >
+          <Typography variant="h6" gutterBottom>
+            API Response
+          </Typography>
 
-        <Typography variant="body2" sx={{ mb: 2 }}>
-          To begin using our image analysis tools:
-        </Typography>
-
-        <ol style={{ paddingLeft: "20px", margin: 0 }}>
-          <li>
-            <Typography variant="body2" sx={{ mb: 1 }}>
-              Upload two images using the panel on the left side of the screen
-            </Typography>
-          </li>
-          <li>
-            <Typography variant="body2" sx={{ mb: 1 }}>
-              Click the "Process Images" button once both images are uploaded
-            </Typography>
-          </li>
-          <li>
-            <Typography variant="body2" sx={{ mb: 1 }}>
-              View the analysis results and use our interactive tools to explore
-              the differences
-            </Typography>
-          </li>
-          <li>
-            <Typography variant="body2">
-              Export your findings or save them to your account for future
-              reference
-            </Typography>
-          </li>
-        </ol>
-      </Box>
+          <Box
+            component="pre"
+            sx={{
+              borderRadius: 2,
+              p: 2,
+              overflowX: "auto",
+              fontFamily: "Consolas, 'Courier New', monospace",
+              fontSize: "0.9rem",
+              color: "#d4d4d4",
+            }}
+          >
+            {data ? JSON.stringify(data, null, 2) : "Failed..."}
+          </Box>
+        </Box>
+      ) : loading ? (
+        <CircularProgress />
+      ) : (
+        <></>
+      )}
     </Box>
   );
 };

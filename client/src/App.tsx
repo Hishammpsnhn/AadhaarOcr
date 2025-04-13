@@ -1,8 +1,17 @@
 import { Container, Paper } from "@mui/material";
 import ImageUploader from "./components/ImageUploader";
 import ExtractDetails from "./components/ExtractDetails";
+import { useState } from "react";
 
 export default function App() {
+  const [data, setData] = useState<any>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+  console.log(data)
+
+  const GetData = (data: any,loading:boolean) => {
+    setData(data)
+    setLoading(loading)
+  };
   return (
     <Container
       maxWidth={false}
@@ -19,10 +28,10 @@ export default function App() {
         }}
       >
         {/* Left Side - Upload Panel */}
-        <ImageUploader />
+        <ImageUploader GetData={GetData} />
 
         {/* Right Side - Content */}
-        <ExtractDetails />
+        <ExtractDetails data={data} loading={loading}/>
       </Paper>
     </Container>
   );
