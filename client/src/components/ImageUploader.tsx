@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
@@ -21,6 +21,8 @@ type ImageUploaderProps = {
 
 const ImageUploader: React.FC<ImageUploaderProps> = ({ GetData }) => {
   const { data, apiError, loading, makeRequest } = useApi();
+  console.log(data, apiError);
+
   const [images, setImages] = useState<(File | null)[]>([null, null]);
   const [error, setError] = useState("");
 
@@ -37,7 +39,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ GetData }) => {
         return;
       }
       const newImages = [...images];
-      newImages[index] = file
+      newImages[index] = file;
       setImages(newImages);
       setError("");
     }
@@ -49,29 +51,39 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ GetData }) => {
     setImages(newImages);
   };
 
-  const handleSubmit = async() => {
+  const handleSubmit = async () => {
     const formData = new FormData();
-  
+
     images.forEach((file) => {
       if (file) {
-        formData.append("images", file); 
+        formData.append("images", file);
       }
     });
-    GetData(null,true)
-    const res = await makeRequest({
-      method: "POST",
-      url: `${import.meta.env.VITE_API_URL}/api/ocr`,
-      data: formData,
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
-    if(res){
-      console.log(res);
-      GetData(res,false)
+    try {
+      GetData(null, true);
+      const res = await makeRequest({
+        method: "POST",
+        url: `${import.meta.env.VITE_API_URL}/api/ocr`,
+        data: formData,
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      if (res) {
+        console.log(res);
+        GetData(res, false);
+      } else {
+        GetData(null, false);
+      }
+    } catch (error) {
+      console.log(error)
     }
   };
-  
+
+  useEffect(() => {
+    if (apiError) setError(apiError);
+  }, [apiError]);
+
   return (
     <Box
       sx={{
@@ -88,7 +100,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ GetData }) => {
       </Typography>
 
       <Typography variant="body2" color="text.secondary" sx={{ mb: 4 }}>
-        Upload two images to compare or analyze side by side
+        Upload two side of images to extract
       </Typography>
 
       {error && (
@@ -128,7 +140,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ GetData }) => {
                   alt={`Uploaded image ${index + 1}`}
                   sx={{
                     height: "100%",
-                    objectFit: "contain",
+                    objectFit: "cover",
                     bgcolor: "#fff",
                   }}
                 />
@@ -179,7 +191,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ GetData }) => {
                   sx={{ fontSize: 48, color: "primary.main", mb: 1 }}
                 />
                 <Typography variant="body2" color="text.secondary">
-                  Click to upload image
+                  {index ? "Upload Rear Side" : "Upload Front Side"}
                 </Typography>
               </Box>
             )}
@@ -192,7 +204,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ GetData }) => {
           startIcon={<CloudUploadIcon />}
           sx={{ mt: "auto" }}
           onClick={handleSubmit}
-          disabled={!images[0] || !images[1]}
+          disabled={!images[0] || !images[1] || loading}
         >
           {!images[0] || !images[1] ? "Upload Both Side" : "Process Images"}
         </Button>
