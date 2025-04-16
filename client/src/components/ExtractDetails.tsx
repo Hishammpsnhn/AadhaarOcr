@@ -2,11 +2,9 @@ import {
   Alert,
   Box,
   CircularProgress,
-  Divider,
-  TextField,
   Typography,
 } from "@mui/material";
-import React, { useState } from "react";
+import React from "react";
 import ResponseCoder from "./ResposeCoder";
 import FormData from "./FormData";
 type Props = {
